@@ -41,35 +41,19 @@ func main() {
 		} else {
 			os.Exit(1)
 		}
-	} else {
-		// debug
-		fmt.Println("pm.dat WAS found")
 	}
 
-	// mockData := data.PMDictionary{
-	// 	"service1": data.Credentials{
-	// 		Username: "user1",
-	// 		Password: "password1",
-	// 	},
-	// 	"service2": data.Credentials{
-	// 		Username: "user2",
-	// 		Password: "password2",
-	// 	},
-	// 	"service3": data.Credentials{
-	// 		Username: "user3",
-	// 		Password: "password3",
-	// 	},
+	pm.RunPmShell(key)
+
+	// // status := files.SavePmFile(key, mockData)
+
+	// // fmt.Printf("status: %v\n", status)
+
+	// dict, err := files.LoadPmFile(key)
+
+	// if err != nil {
+	// 	fmt.Printf("err: %v\n", err)
 	// }
-
-	// status := files.SavePmFile(key, mockData)
-
-	// fmt.Printf("status: %v\n", status)
-
-	dict, err := files.LoadPmFile(key)
-
-	if err != nil {
-		fmt.Printf("err: %v\n", err)
-	}
-	fmt.Println(dict)
+	// fmt.Println(dict)
 
 }
