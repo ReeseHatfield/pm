@@ -16,6 +16,11 @@ func LoadPmFile(key []byte) (data.PMDictionary, error) {
 	path := GetPMPath()
 	file, err := os.Open(path)
 	if err != nil {
+
+		if os.IsNotExist(err) {
+			fmt.Println("Could not find existing pm data, setting up new instance...")
+			return data.PMDictionary{}, nil
+		}
 		return pmDict, fmt.Errorf("failed to open PM file: %w", err)
 	}
 	defer file.Close()
@@ -23,6 +28,11 @@ func LoadPmFile(key []byte) (data.PMDictionary, error) {
 	encryptedDict, err := os.ReadFile(path)
 	if err != nil {
 		return pmDict, fmt.Errorf("failed to read PM file: %w", err)
+	}
+
+	if len(encryptedDict) == 0 {
+		fmt.Println("Could not find existing pm data, setting up new instance...")
+		return data.PMDictionary{}, nil
 	}
 
 	serializedDict, err := crypt.Decrypt(encryptedDict, key)
@@ -43,6 +53,7 @@ func LoadPmFile(key []byte) (data.PMDictionary, error) {
 // this should be made to return an error not a status to be more go like
 func SavePmFile(key []byte, dict data.PMDictionary) (status bool) {
 
+	fmt.Println("save did get called")
 	// serialize PMDictionary
 	buffer := new(bytes.Buffer)
 	serializer := gob.NewEncoder(buffer)

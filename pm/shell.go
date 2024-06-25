@@ -24,11 +24,14 @@ func RunCommand(cmdString string) string {
 func Usage() {
 
 	usage := `
-1. get [website thingy] Gets credentials for [website thing]
-2. add [website thingy] Add credentials for [website thingy]
-3. del [website thingy] Delete credentials for [website thingy]
-4. upd [website thingy] Update credentials for [website thingy]
-	`
+    Command		|	 		Description
+====================================================
+get service		|	 Gets credentials for service
+add service		|	 Add credentials for service
+del service		|	 Delete credentials for service
+upd service		|	 Update credentials for service
+ls 			|	 List all services
+`
 	fmt.Println(usage)
 }
 
@@ -50,20 +53,23 @@ func RunPmShell(key []byte) {
 		fmt.Print(">> ")
 		cmd, arg := GetCommand(*reader)
 
+		fmt.Printf("arg: %v\n", arg)
+
 		switch cmd {
 		case "help", "-help", "--help":
 			Usage()
+		case "ls":
+			ls(dict)
 		case "get":
-			dict = get(arg, dict)
+			get(arg, dict)
 		case "add":
-			dict = add(arg, dict)
+			dict = add(arg, dict, reader)
 		case "del":
 			dict = del(arg, dict)
 		case "upd":
-			dict = upd(arg, dict)
-		case "print-all":
-			// debug, delete in prod
-			fmt.Println(dict)
+			dict = upd(arg, dict, reader)
+		case "find":
+			//fuzzy find thru services
 		case "exit", "quit", "q":
 			return
 		default:
@@ -75,26 +81,68 @@ func RunPmShell(key []byte) {
 	}
 }
 
-func get(service string, dict data.PMDictionary) data.PMDictionary {
+func ls(dict data.PMDictionary) {
+	for k := range dict {
+		fmt.Println(k)
+	}
+}
+
+func get(service string, dict data.PMDictionary) {
+	cred, ok := dict[service]
+
+	if !ok {
+		fmt.Println("Could not find service: ", service)
+		return
+	}
+
+	fmt.Println(cred.String())
+}
+
+func upd(service string, dict data.PMDictionary, reader *bufio.Reader) data.PMDictionary {
 	return dict
 }
 
-func upd(service string, dict data.PMDictionary) data.PMDictionary {
-	return dict
-}
+func add(service string, dict data.PMDictionary, reader *bufio.Reader) data.PMDictionary {
 
-func add(service string, dict data.PMDictionary) data.PMDictionary {
+	if service == "" {
+		fmt.Println("Error: service must have name")
+		return dict
+	}
+
+	fmt.Print("Username/Email? ")
+	username, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Error reading input:", err)
+		return dict
+	}
+	username = strings.TrimSpace(username)
+
+	fmt.Print("Password?")
+	password, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Error reading input:", err)
+		return dict
+	}
+	password = strings.TrimSpace(password)
+
+	dict[service] = data.Credentials{
+		Username: username,
+		Password: password,
+	}
+
 	return dict
+
 }
 
 func del(service string, dict data.PMDictionary) data.PMDictionary {
 	return dict
 }
 
-func GetCommand(reader bufio.Reader) (cmd, arg string) {
+func GetCommand(reader bufio.Reader) (cmd string, arg string) {
+
 	input, err := reader.ReadString('\n')
 	if err != nil {
-		fmt.Println("Error reading input:", err)
+		fmt.Println(err)
 		return
 	}
 
@@ -102,13 +150,15 @@ func GetCommand(reader bufio.Reader) (cmd, arg string) {
 
 	parts := strings.Split(input, " ")
 
-	// there is probably a better way of doing this
 	cmd = parts[0]
-	if len(parts) > 1 {
-		arg = parts[1]
-	} else {
-		arg = ""
+	remaining := parts[1:]
+
+	arg = ""
+	for _, s := range remaining {
+		arg += (s + "-")
 	}
+
+	arg = strings.TrimSuffix(arg, "-")
 
 	return cmd, arg
 
