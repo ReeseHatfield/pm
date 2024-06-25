@@ -53,7 +53,6 @@ func LoadPmFile(key []byte) (data.PMDictionary, error) {
 // this should be made to return an error not a status to be more go like
 func SavePmFile(key []byte, dict data.PMDictionary) (status bool) {
 
-	fmt.Println("save did get called")
 	// serialize PMDictionary
 	buffer := new(bytes.Buffer)
 	serializer := gob.NewEncoder(buffer)
