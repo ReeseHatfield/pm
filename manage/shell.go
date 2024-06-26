@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"pm/crypt"
 	"pm/data"
 	"pm/files"
 	"strings"
@@ -37,19 +38,18 @@ ls 			|	 List all services
 
 func RunPmShell(key []byte) {
 
-	dict, err := files.LoadPmFile(key)
-	if err != nil {
-		fmt.Printf("err: %v\n", err)
-		fmt.Println("Could not load pm, Is your key wrong?")
-		return
-	}
-
 	fmt.Println("Welcome to the pm shell")
 	Usage()
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
 
+		dict, err := files.LoadPmFile(key)
+		if err != nil {
+			fmt.Printf("err: %v\n", err)
+			fmt.Println("Could not load pm, Is your key wrong?")
+			return
+		}
 		fmt.Print(">> ")
 		cmd, arg := GetCommand(*reader)
 
@@ -78,6 +78,13 @@ func RunPmShell(key []byte) {
 		}
 
 		files.SavePmFile(key, dict)
+
+		// clear memory buffers to ensure data does not exist in mem.
+		for k, v := range dict {
+			crypt.MemClear(&v.Username)
+			crypt.MemClear(&v.Password)
+			delete(dict, k)
+		}
 	}
 }
 
