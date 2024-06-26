@@ -8,6 +8,15 @@ your data on the drive will *NOT* be affected in any way, and you can continue t
 your device as normal. All your files are serialized and encrypted until a pm shell is lauched with 
 the `pm` command.
 
+## Installation:
+To install `pm` run the following commands:
+```bash
+git clone https://github.com/ReeseHatfield/pm.git
+cd pm
+chmod u+x install.sh
+./install.sh
+```
+
 ## `pm` Shell Commands
 
 | CMD   |   Argument   |                Description                       |
