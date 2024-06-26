@@ -69,7 +69,7 @@ func RunPmShell(key []byte) {
 		case "upd":
 			dict = upd(arg, dict, reader)
 		case "find":
-			//fuzzy find thru services
+			//TODO fuzzy find thru services
 		case "exit", "quit", "q":
 			return
 		default:
