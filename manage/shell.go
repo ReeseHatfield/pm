@@ -101,7 +101,7 @@ func get(service string, dict data.PMDictionary) {
 func upd(service string, dict data.PMDictionary, reader *bufio.Reader) data.PMDictionary {
 	_, ok := dict[service]
 	if !ok {
-		fmt.Println("Err, could not find service: ", service)
+		fmt.Println("Err, could not find serbice: ", service)
 		return dict
 	}
 
